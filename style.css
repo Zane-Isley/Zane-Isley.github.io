@@ -71,3 +71,9 @@ h2 {
 .assignment p {
   margin-top: 0.5em;
 }
+
+#vgraph {
+  width: 100%;
+  min-width: 100%;
+  object-fit: contain;
+}

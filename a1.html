@@ -4,15 +4,170 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
 
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <title>Zane Isley's HCDE 439 Physical Computing Page!</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Example Student's Assignment 1!</h1>
-    <div class="header">
-      <img src="red-panda.jpg" />
-      <p>Here is all the documentation for assignment 1!</p>
+    <h1>Zane Isley's Assignment 1!</h1>
+    <div class="grid">
+      <div class="assignment">
+        <div>
+          <h2>Circuit Schematic:</h2>
+          <div class="header">
+            <img src="A1-schematic.JPG" />
+          </div>
+          <p>
+            The circuit schematic for A1 was created using "www.circuit-diagram.org"
+            and features my circuit in the state where is powered by a 9 volt battery.
+            All connections to the Arduino Uno are in the correct ports, the LEDs have
+            their anodes oriented correctly, and all lights are connected back to the
+            ground port via the bread board.
+          </p>
+        </div>
+        <div>
+          <h2>Circuit:</h2>
+          <div class="header">
+            <img src="circuit.jpg" />
+          </div>
+          <p>
+            My circuit for A1 features three LED lights connected to my Arduino Uno
+            via ports D13, D8, and D7. I needed to calculate the resistance for each
+            of these LEDs. We know that yellow, red, and green LEDs all experience 1.8 V
+            drop. After some research, I found that the Arduino Uno opporates at 5 V.
+            V = I x R. We know I = 0.02. We know V = 5 - 1.8 (3.2). 3.2 = 0.02 x R,
+            R = 3.2 / 0.02, R = 160 Ohms. I dont have a 160 Ohm resistors, so my circuit
+            features 100 Ohm resistes.
+          </p>
+        </div>
+        <div>
+          <h2>"Blinking" Operation:</h2>
+          <div class="header">
+            <img src="blinking.gif" />
+          </div>
+          <p>
+            For my project, I decided to use the green, yellow, and red lights to
+            envoke the feelings associated with a traffic light. I thought it was a
+            fun (albeit predicatable) color scheme to base my blinks on. For the
+            pattern itself, I actually had my roommate describe to me a blinking pattern
+            that he would like to see, and I based the blinking on that. This is because,
+            as designers, our creativity is often dictated by project managers, so
+            I simmulated this in A1.
+          </p>
+        </div>
+        <div class="header">
+          <h2>Code Snippet:</h2>
+          <pre>
+            #define g_led 7                       //identifies the port used by the green light to supply power
+            #define y_led 8                       //identifies the port used by the green light to supply power
+            #define r_led 13                      //identifies the port used by the green light to supply power
+
+            // the setup function runs once you press reset or power the board
+            void setup()  {
+              pinMode(g_led, OUTPUT);             //initialize digital pin g_led as an output for the green LED
+              pinMode(y_led, OUTPUT);             //initialize digital pin y_led as an output for the yellow LED
+              pinMode(r_led, OUTPUT);             //initialize digital pin r_led as an output for the red LED
+            }
+
+            // the loop function runs over and over again forever
+            void loop() {
+              for (int i=0; i<=2; i++) {          //creates for loop that will run three times
+                int r = r_led;                    //sets int value r to our red LED digital pin
+                if (i==1) {                       //if loop is in second pass, sets r to yellow LED pin
+                  r = y_led;
+                } else if (i==2) {                //if loop is in third pass, sets r to green LED pin
+                  r = g_led;
+                }
+                digitalWrite(r, HIGH);            //turn LED r on to HIGH voltage level
+                delay(200);                       //wait two tenths of a second
+                digitalWrite(r, LOW);             //turn LED r off by making voltage level LOW
+              }
+              delay(200);                         //wait two tenths of a second
+
+              for (int i=0; i<=2; i++) {          //creates for loop that will run three times
+                int r = g_led;                    //sets int value r to our green LED digital pin
+                if (i==1) {                       //if loop is in second pass, sets r to yellow LED pin
+                  r = y_led;
+                } else if (i==2) {                //if loop is in third pass, sets r to red LED pin
+                  r = r_led;
+                }
+                digitalWrite(r, HIGH);            //turn LED r on to HIGH voltage level
+                delay(200);                       //wait two tenths of a second
+                digitalWrite(r, LOW);             //turn LED r off by making voltage level LOW
+              }
+
+              for (int i=0; i<=2; i++) {          //creates for loop that will run three times
+                int r = r_led;                    //sets int value r to our red LED digital pin
+                if (i==1) {                       //if loop is in second pass, sets r to yellow LED pin
+                  r = y_led;
+                } else if (i==2) {                //if loop is in third pass, sets r to green LED pin
+                  r = g_led;
+                }
+                for (int i=0; i<=2; i++) {        //creates for loop that will run three times
+                  digitalWrite(r, HIGH);          //turn LED r on to HIGH voltage level
+                  delay(100);                     //wait one tenth of a second
+                  digitalWrite(r, LOW);           //turn LED r off by making voltage level LOW
+                  delay(100);                     //wait one tenth of a second
+                }
+              }
+
+              for (int i=0; i<=2; i++) {          //creates for loop that will run three times
+                int r = r_led;                    //sets int value r to our red LED digital pin
+                if (i==1) {                       //if loop is in second pass, sets r to yellow LED pin
+                  r = y_led;
+                } else if (i==2) {                //if loop is in third pass, sets r to green LED pin
+                  r = g_led;
+                }
+                digitalWrite(r, HIGH);            //turn LED r on to HIGH voltage level
+                delay(300);                       //wait three tenths of a second
+                digitalWrite(r, LOW);             //turn LED r off by making voltage level LOW
+                delay(100);                       //wait one tenth of a second
+              }
+
+              digitalWrite(r_led, HIGH);          //turn red LED on to HIGH voltage level
+              digitalWrite(y_led, HIGH);          //turn yellow LED on to HIGH voltage level
+              digitalWrite(g_led, HIGH);          //turn green LED on to HIGH voltage level
+              delay(300);                         //wait three tenths of a second
+            }
+          </pre>
+        </div>
+        <div>
+          <h2>Questions:</h2>
+          <h4>
+            Draw a graph where the X axis is time and the Y axis is voltage across the LEDs.
+            Draw a line for each of your 3 LEDs.
+          </h4>
+          <img src="A1-vgraph.JPG" id="vgraph"/>
+          <h4>
+            How many LEDs could you blink at once with your Arduino? How much current would that draw?
+          </h4>
+          <p>
+            According to the Arduino Uno data sheets, the current limitation of the Arduino Uno is
+            200mA. As each LEDs current draw is 20mA, we can assume that we could blink up to 10 LEDs
+            at the same time before topping out the current limitation (20mA x 10 = 200mA).
+          </p>
+          <h4>
+            How many LEDs could you blink with your Arduino if only one were to be on at once?
+          </h4>
+          <p>
+            There are 14 digital pins (0-13) and 6 analog pins (a0-a6) on the Arduino Uno. Because each
+            LED will be lit individually, we don't have to worry about the current draw of each one.
+            14 + 6 results in 20 total LEDs that could be individually "blinked".
+          </p>
+          <h4>
+            How fast do you need to blink your LEDs until you no longer can tell that they are blinking?
+          </h4>
+          <p>
+            I went about this problem in probably the least scientific way possible, but I am not able
+            to attend class monday so I am not sure of a better way to do this. I used the Arduino IDE
+            and set up a program that flashed the light for a tenth of a second. This was an obviously
+            flashing light. I adjusted it to 0.05 seconds. Still flashing. The same was true at 0.025.
+            Finally, me and the group of friends I was with descided that flashing for 0.009 secnds was
+            the slowest blink we were unable to see. 60 / 0.009 = 6666.67, so that is roughly how many
+            times you have to blink a light in a minute before you can no longer tell.
+          </p>
+        </div>
+      </div>
     </div>
   </body>
 </html>
