@@ -4,15 +4,171 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
 
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <title>Zane Isley's HCDE 439 Physical Computing Page!</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Example Student's Assignment 2!</h1>
-    <div class="header">
-      <img src="red-panda.jpg" />
-      <p>Here is all the documentation for assignment 2!</p>
+    <h1>Zane Isley's Assignment 2!</h1>
+    <div class="grid">
+      <div class="assignment">
+        <div>
+          <h2>Circuit Schematic:</h2>
+          <div class="header">
+            <img src="A2-schematic.JPG" id = "vgraph" />
+          </div>
+          <p>
+            The circuit schematic for A2 was created using "www.circuit-diagram.org"
+            Red and Yellow LEDs both drop 1.8V (of 5). Using V = I x R, we can calculate
+            ideal resistance. 3.2 = 0.02 x R. R = 3.2 / 0.02, or R = 160. As I learned
+            from last weeks homework, you should ensure your LED NEVER exceeds 20 mA, so
+            I will need to use a 220 Ohm resistor since I don't have a 160 Ohm one. Finally,
+            I double checked that the current to my LED would be > 20 mA. 3.2 = 220 x I.
+            I = 3.2 / 220, or I = 0.0145, so we are okay.
+          </p>
+          <p>
+            We need to do the same thing with the blue LED. Blue LEDs drop 3.3V, so we are
+            left with 1.7. 1.7 = 0.02 x R. R = 1.7 / 0.02, or R = 85. I will use a 100 Ohm
+            resistor to resist this. I then checked current in the same way. 1.7 = 100 x I.
+            I = 1.7 / 100, or I = 0.017, which is also less than 20 mA.
+          </p>
+        </div>
+        <div>
+          <h2>Circuit:</h2>
+          <div class="header">
+            <img src="circuit2.jpg" />
+          </div>
+          <p>
+            My circuit for A2 is, in many ways, very similar to the circuit I created for A1.
+            The cheif difference is that I added a button to the mix, to include an element
+            of input to the equation. For A2, my button is wired to pin 13, which I have learned
+            to not do in the future as pin 13 is also the onboard LED port, although for the
+            purposes of this assignment it seems to cause no problems. I used a 10k resistor on the
+            button because using these high Ohm resistors are a good way to increase accuracy of
+            input devices in electronics. As discussed in class, it is significantly more than any
+            current amount we would need to resist with any component, and ensures our button will
+            work when and how we need it to.
+          </p>
+        </div>
+        <div>
+          <h2>"Blinking" Operation:</h2>
+          <div class="header">
+            <img src="fading.gif" />
+          </div>
+          <p>
+            For my project, I decided to use the blue, yellow, and red lights
+            because these are the primary colors that all other colors are made from.
+            My A2 is a "favorite color picker." It pulses through the three colors,
+            flashing for a tenth of a second each time. When the button is pressed, the
+            currently selected color begins to pulse using analogWrite, indicating the
+            users preferred color.
+          </p>
+        </div>
+        <div class="header">
+          <h2>Code Snippet:</h2>
+          <pre>
+            const int buttonPin = 13;                               //identifies the number of the pushbutton pin
+            const int rPin = 11;                                    //identifies the number of the red LED pin
+            const int bPin = 3;                                     //identifies the number of the blue LED pin
+            const int yPin = 6;                                     //identifies the number of the yellow LED pin
+
+
+            void setup() {
+              // initialize the LED pins as an output:
+              pinMode(rPin, OUTPUT);
+              pinMode(bPin, OUTPUT);
+              pinMode(yPin, OUTPUT);
+              // initialize the pushbutton pin as an input:
+              pinMode(buttonPin, INPUT);
+            }
+
+            void loop() {
+
+                for (int i=0; i<5; i++) {                           //creates for loop that will run 5 times
+                  while (digitalRead(buttonPin) == HIGH) {          //checks to see if button is pressed and enters while loop if it is
+                    for(int j=0; j < 255; j++){                     //creates for loop that is used to "pulse" the LED
+                      analogWrite(rPin,j);                          //sets power level to LED at some level j between 0 and 255
+                      delay(2);                                     //two milisecond delay
+                    }
+                    for(int j=255; j > 0; j--){                     //creates for loop that is used to "pulse" the LED down
+                      analogWrite(rPin,j);                          //sets power level to LED at some level j between 255 and 0
+                      delay(2);                                     //two milisecond delay
+                    }
+                  }
+                  digitalWrite(rPin, HIGH);                         //turn red LED on
+                  delay(100);                                       //100 milisecond delay
+                  digitalWrite(rPin, LOW);                          //turn red LED off
+                  delay(500);                                       //500 milisecond delay
+                }
+
+                for (int i=0; i<5; i++) {                           //creates for loop that will run 5 times
+                  while (digitalRead(buttonPin) == HIGH) {          //checks to see if button is pressed and enters while loop if it is
+                    for(int j=0; j < 255; j++){                     //creates for loop that is used to "pulse" the LED
+                      analogWrite(yPin,j);                          //sets power level to LED at some level j between 0 and 255
+                      delay(2);                                     //two milisecond delay
+                    }
+                    for(int j=255; j > 0; j--){                     //creates for loop that is used to "pulse" the LED down
+                      analogWrite(yPin,j);                          //sets power level to LED at some level j between 255 and 0
+                      delay(2);                                     //two milisecond delay
+                    }
+                  }
+                  digitalWrite(yPin, HIGH);                         //turn yellow LED on
+                  delay(100);                                       //100 milisecond delay
+                  digitalWrite(yPin, LOW);                          //turn yellow LED off
+                  delay(500);                                       //500 milisecond delay
+                }
+
+                for (int i=0; i<5; i++) {                           //creates for loop that will run 5 times
+                  while (digitalRead(buttonPin) == HIGH) {          //checks to see if button is pressed and enters while loop if it is
+                    for(int j=0; j < 255; j++){                     //creates for loop that is used to "pulse" the LED
+                      analogWrite(bPin,j);                          //sets power level to LED at some level j between 0 and 255
+                      delay(2);                                     //two milisecond delay
+                    }
+                    for(int j=255; j > 0; j--){                     //creates for loop that is used to "pulse" the LED down
+                      analogWrite(bPin,j);                          //sets power level to LED at some level j between 255 and 0
+                      delay(2);                                     //two milisecond delay
+                    }
+                  }
+                  digitalWrite(bPin, HIGH);                         //turn blue LED on
+                  delay(100);                                       //100 milisecond delay
+                  digitalWrite(bPin, LOW);                          //turn blue LED off
+                  delay(500);                                       //500 milisecond delay
+                }
+            }
+          </pre>
+        </div>
+        <div>
+          <h2>Questions:</h2>
+          <h4>
+            Draw a chart where the X axis is time and the Y axis is voltage. Draw 3 lines
+            representing the voltage across an LED with analogWrite(led, 64), analogWrite(led, 128),
+            and analogWrite(led,255).
+          </h4>
+          <p>
+            For my graph, I used blue LEDs, which use 3.3V at full capacity.
+          </p>
+          <img src="A2vchart.JPG" id="vgraph"/>
+          <h4>
+            Given your schematic, circuit, and firmware, assuming the only thing that draws current
+            is your LEDs, how long would your circuit run if powered by a 1200 mAh battery?
+          </h4>
+          <p>
+            Based on the calculations from earlier, we know that current passing through the red/yellow
+            LEDs is 14.5 mA, and the current passing through my blue LED is 17 mA. A 1200 mAh battery
+            will die in 1 hour if drawing 1200 mAh battery constantly. The lights in my circuit (assuming
+            the button is never pressed) blink on for a tenth of a second, and off for a half. A full
+            cycle through my circuit (15 blinks) takes 9 seconds. That means that my circuit can complete
+            400 cycles in an hour, for a total of 6000 blinks (400 x 15) or 2000 blinks each light. since
+            each blink is a tenth of a second, we know that over the course of an hour each light would be
+            on for 200 seconds. This means that, over the course of an hour, we are providing 14.5 mA for
+            400 seconds, and 17 mA 200 seconds. A 1200 mAh battery could provide 14.5 mA for ~ 82.76 hours
+            (1200 / 14.5). A 1200 mAh battery could provide 17 mA for ~ 70.59 hours (1200 / 17). Since 2/3
+            of the time we are drawing 14.5 mA, and 1/3 of the time we are drawing 17 mA, we should be able
+            to solve total hours by calculating 2/3(82.76) + 1/3(70.59). Assuming the button is never pressed,
+            a 1200 mAh battery should poweer my circuit for ~ 78.7 hours.
+          </p>
+        </div>
+      </div>
     </div>
   </body>
 </html>
