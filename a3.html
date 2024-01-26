@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Zane Isley's HCDE 439 Physical Computing Page!</title>
+
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Zane Isley's Assignment 3!</h1>
+    <div class="grid">
+      <div class="assignment">
+        <div>
+          <h2>Circuit Schematic:</h2>
+          <div class="header">
+            <img src="A3-Schematic.png" id = "vgraph" />
+          </div>
+          <p>
+            The circuit schematic for A2 was created using "www.circuit-diagram.org"
+            I only use blue LED for this assignment, so using calculations from A2 of
+            1.7 = 0.02 x R. R = 1.7 / 0.02. Our R value is 85, so I used 100 Ohm resistors.
+            1.7 = 100 x I. I = 1.7 / 100, or I = 0.017, which is also less than 20 mA.
+            Our LED lights will be safe.
+          </p>
+        </div>
+        <div>
+          <h2>Circuit:</h2>
+          <div class="header">
+            <img src="circuit3.jpg" />
+          </div>
+          <p>
+            My circuit utalizes a thermistor as the variable resistor. During standard
+            opporation in my home (using a space heater to control temp) I observed
+            voltages between 2.32 and 0.73. We can use those to calculate expected resistance
+            at our thermistor (using R1 = (Vin(R2) - Vout(R2)) / Vout). Our Vin value is 5, our R2
+            is the 10K Ohm resistor, and our Vout values are 2.32 and 0.73.
+          </p>
+          <p>
+            R1 = (5x10000 - 2.32x10000)/2.32 = 26800/2.32 ~ 11.5k <br>
+            R1 = (5x10000 - 0.73x10000)/0.73 = 42700/0.73 ~ 58.5k <br>
+            Based on these calculations, we see that our resistor is opporating between 10-60k ohms,
+            which is right around where expected. Our thermistor is an appropriate variable resistor
+            as, according to its datasheet, resists between 10k and 100k ohms.
+          </p>
+        </div>
+        <div>
+          <h2>Circuit Operation:</h2>
+          <div class="header">
+            <img src="fading.gif" />
+          </div>
+          <p>
+            For this assignment, we were challanged to create a device that uses input and output
+            information using a variable resistor. I used a thermistor to create what I call a
+            "reverse thermometer." As we were required to use more than one LED, I used 5 to make a
+            bar similar to old mercury thermometers. The cheif differenece it I used blue LEDs to
+            represent cold and the bar rises as the temperature decreases. Additionally, I used
+            analogWrite to represent smaller changes in the temperatue, as the brightness is reflected
+            by measurements made by the thermistor.
+          </p>
+        </div>
+        <div class="header">
+          <h2>Code Snippet:</h2>
+          <pre>
+            const int analogInPin = A1;                             //identifies analog pin to be used to read thermistor
+            const int lvl1 = 3;                                     //identifies pin to be used for "cool level 1" led
+            const int lvl2 = 5;                                     //identifies pin to be used for "cool level 2" led
+            const int lvl3 = 6;                                     //identifies pin to be used for "cool level 3" led
+            const int lvl4 = 9;                                     //identifies pin to be used for "cool level 4" led
+            const int lvl5 = 10;                                    //identifies pin to be used for "cool level 5" led
+
+            int sensorValue = 0;                                    //value read from the thermistor
+            int outputValue = 0;                                    //value output to the PWM (analog out)
+            int sensorMin = 1023;                                   //sets minimum sensor value
+            int sensorMax = 0;                                      //sets maximum sensor value
+
+            void setup() {
+
+              //initialize serial communications at 9600 bps:
+              Serial.begin(9600);
+
+              //initialize the LED pins as an output:
+              pinMode(lvl1, OUTPUT);
+              pinMode(lvl2, OUTPUT);
+              pinMode(lvl3, OUTPUT);
+              pinMode(lvl4, OUTPUT);
+              pinMode(lvl5, OUTPUT);
+
+              //initialize thermistor as input:
+              pinmode(analogInPin, INPUT);
+
+              while (millis() < 10000) {                            //creates while loop for 10 second calibration period
+                sensorValue = analogRead(analogInPin);              //sets sensorValue equal to what is read by thermistor
+
+                if (sensorValue > sensorMax) {                      //checks to see if sensorValue is larger than max recorded value
+                  sensorMax = sensorValue;                          //sets max recorded value to current value
+                }
+
+                if (sensorValue < sensorMin) {                      //checks to see if sensorValue is smaller than min recorded value
+                  sensorMin = sensorValue;                          //sets min recorded value to current value
+                }
+              }
+            }
+
+            void loop() {
+              sensorValue = analogRead(analogInPin);                        //sets sensorValue equal to what is read by thermistor
+              sensorValue = constrain(sensorValue, sensorMin, sensorMax);   //ensures sensor value is never outside of bounds of min/max
+              outputValue = map(sensorValue, sensorMin, sensorMax, 0, 255); //maps recorded min/max values to 8 bit number needed for analogWrite
+
+              if (sensorValue > 800) {                              //checks if current sensor value is higher than 800
+                digitalWrite(lvl5, LOW);                            //turn LED off
+                digitalWrite(lvl4, LOW);                            //turn LED off
+                digitalWrite(lvl3, LOW);                            //turn LED off
+                digitalWrite(lvl2, LOW);                            //turn LED off
+                digitalWrite(lvl1, LOW);                            //turn LED off
+              } else if (sensorValue <= 800 && sensorValue > 700) { //checks if current sensor value is higher than 700 and less than 800
+                digitalWrite(lvl5, LOW);                            //turn LED off
+                digitalWrite(lvl4, LOW);                            //turn LED off
+                digitalWrite(lvl3, LOW);                            //turn LED off
+                digitalWrite(lvl2, LOW);                            //turn LED off
+                analogWrite(lvl1, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+              } else if (sensorValue <= 700 && sensorValue > 650) { //checks if current sensor value is higher than 650 and less than 700
+                digitalWrite(lvl5, LOW);                            //turn LED off
+                digitalWrite(lvl4, LOW);                            //turn LED off
+                digitalWrite(lvl3, LOW);                            //turn LED off
+                analogWrite(lvl2, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl1, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+              } else if (sensorValue <= 650 && sensorValue > 600) { //checks if current sensor value is higher than 600 and less than 6500
+                digitalWrite(lvl5, LOW);                            //turn LED off
+                digitalWrite(lvl4, LOW);                            //turn LED off
+                analogWrite(lvl3, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl2, 250-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl1, 250-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+              } else if (sensorValue <= 600 && sensorValue > 500) { //checks if current sensor value is higher than 500 and less than 600
+                digitalWrite(lvl5, LOW);                            //turn LED off
+                analogWrite(lvl4, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl3, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl2, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl1, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+              } else {                                              //enters if sensor reading is less than 500
+                analogWrite(lvl5, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl4, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl3, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl2, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+                analogWrite(lvl1, 255-outputValue);                 //turns LED on to a brightness determined by current sensor reading
+              }
+
+              //print the results to the Serial Monitor (mostly used in development + for debugging)
+              Serial.print("sensor = ");
+              Serial.print(sensorValue);
+              Serial.print("\t output = ");
+              Serial.println(outputValue);
+
+              delay(2);                                             //2 millisecond delay
+            }
+          </pre>
+        </div>
+        <div>
+          <h2>Questions:</h2>
+          <h4>
+            In your voltage divider, can the variable resistor be either R1 or R2 or does it
+            need to be one or the other? Justify your answer with example calculations.
+          </h4>
+          <p>
+            Lets say our variable resistor is currently resisting 1000 Ohms. To calculate the voltage
+            output, we will use Vout = (R2 / R1 + R2) Vin. For starters, we will make R1 our variable
+            resistor as we see in my circuit. We can find our Vout by calculating 10000 / 1000 + 10000
+            x 5, which is 4.545. If we change the position of the variable resistor to be R2, our
+            calculation becomes 1000 / 10000 + 1000 x 5, or 0.454. These are obviously very different
+            values, and if we want our circuit to behave the same in both positions, we would need to
+            alter our code, so no, the variable resistor cannot be in either position without additional
+            work.
+          </p>
+          <h4>
+            Draw a graph where the x-axis is time and the y-axis is voltage. Plot the voltage at
+            V-measure of your voltage divider of your shared gif.
+          </h4>
+          <img src="vgraph3.jpg" id = "vgraph" />
+          <h4>
+            AnalogWrite and analogRead are respectively 8-bit and 10-bit values. Imagine you
+            had 10-bit PWM and a 16-bit analog-to-digital converter instead. How would this change
+            your map() code? Explain your answer.
+          </h4>
+          <p>
+            With our current map code we map a 10 bit sensor value (analogRead) to an 8 bit AnalogWrite
+            function. This code looks like: "outputValue = map(sensorValue, 0, 1023, 0, 255);" We get
+            these values of 1023 and 255 by 2^10-1 and 2^8-1 respectively. The first thing we need to find
+            is 2^16-1 for our analog -> digital converter, which is 65535. Our 10 bit PWM takes the place
+            of analogWrite, and our 16 bit number takes the place of analogRead, so the new line of code
+            would read "outputValue = map(sensorValue, 0, 65535, 0, 1023);"
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
