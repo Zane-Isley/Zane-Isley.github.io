@@ -40,7 +40,7 @@
         <div>
           <h2>Circuit Operation:</h2>
           <div class="header">
-            <img src="assets/thermometer.gif" id = "vgraph"/>
+            <img src="assets/A4function.gif" id = "vgraph"/>
           </div>
           <p>
             For my assignment 4, I knew I wanted to use the servo motor as we had spent so much time
@@ -123,22 +123,38 @@
             for (int i=0, i < 180, i++){servo.write(i); delay(100);} <br> Draw a graph with the X axis in
             seconds, for two seconds, and the y-axis the voltage at pin 9 with respect to ground.
           </h4>
-          <p>
-
-          </p>
+          <img src="assets/A4graph.JPG" id = "vgraph"/>
           <h4>
             Your input device is slightly broken, leading it to give us an erroneous reading 1% of
              the time. How can we address this? Answer in (pseudo)code.
           </h4>
           <p>
+            callibrate an average deviation (avg) during set up<br>
+            <br>
+            record value from input device (in1)<br>
+            half second delay<br>
+            record value from input device (in2)<br>
+            check if in2 is within avg of in1<br>
+              if it is, record in2<br>
+              in1 = in2<br>
 
+              if not<br>
+              dont record in2,<br>
+              record new value for in2<br>
+              check again<br>
           </p>
           <h4>
             Your input device is slightly noisy, leading the measurement to randomly deviate from
             the true measurement up or down by 10%. How can we address this? Answer in (pseudo)code.
           </h4>
           <p>
-
+            during set up:<br>
+            find max recorded value from input device<br>
+            find min recorded value from input device<br>
+            <br>
+            during loop:<br>
+            map the min/max values to values one 10th of the size, so readings within that 10% up or
+            down will fall into the correct area of where we want.
           </p>
         </div>
       </div>
