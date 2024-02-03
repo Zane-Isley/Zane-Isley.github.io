@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Zane Isley's HCDE 439 Physical Computing Page!</title>
+
+    <link href="style/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Zane Isley's Assignment 3!</h1>
+    <div class="grid">
+      <div class="assignment">
+        <div>
+          <h2>Circuit Schematic:</h2>
+          <div class="header">
+            <img src="assets/A4-Schematic.JPG" id = "vgraph" />
+          </div>
+          <p>
+            The circuit schematic for A4 was created using "www.circuit-diagram.org"
+            I used a red and green LED with a 220 ohm resistor (3.2 = 0.02 x R. R = 3.2 / 0.02, or
+             R = 160 //  3.2 = 220 x I. I = 3.2 / 220, or I = 0.0145) The membrane keypad is a
+             matrix of wires connected via push buttons and is represenred as such in the schematic.
+          </p>
+        </div>
+        <div>
+          <h2>Circuit:</h2>
+          <div class="header">
+            <img src="assets/circuit4.jpg" />
+          </div>
+          <p>
+            As our circuit needed to utalize two libraries, I decided to utalize the library we learned
+            in class (servo motor) and an input device that required a library (as we needed both an
+            input and output device). For the membrane keypad, I was able to find a well maintained
+            library on github called "keypad" (by Mark Stanley and Alexander Brevig). It had all of
+            the calls needed to set up and implement my keypad
+          </p>
+        </div>
+        <div>
+          <h2>Circuit Operation:</h2>
+          <div class="header">
+            <img src="assets/thermometer.gif" id = "vgraph"/>
+          </div>
+          <p>
+            For my assignment 4, I knew I wanted to use the servo motor as we had spent so much time
+            with it in class already and I thought that the membrade keypad was a very interesting
+            element. When I considered the keypad, I thought about 4-digit pins. I wanted to make a
+            machine that would take a pin and do something with the servo motor if correct. While
+            creating the circuit, I used a red and green LED to debug (indicating write or wrong).
+            After I added the feature of using the servo motor to raise a flag, I left the lights as
+            part of the circuit as, without them, it's difficult to know when you get the pin wrong or
+            when the cycle resets.
+          </p>
+        </div>
+        <div class="header">
+          <h2>Code Snippet:</h2>
+          <pre>
+            #include <Keypad.h>                                                         //retrieves keypad library(see:https://github.com/Chris--A/Keypad)
+            #include <Servo.h>                                                          //retrieves servo library
+
+            const int green = 13;                                                       //assigns green led to pin 13
+            const int red = 12;                                                         //assigns red led to pin 12
+
+            //the following chunk of code comes from (https://github.com/Chris--A/Keypad) in the HelloKeypad.ino
+            //It is used to create your keypad
+            const byte ROWS = 4;                                                        //four rows
+            const byte COLS = 3;                                                        //three columns
+            char keys[ROWS][COLS] = {                                                   //creates matrix of rows and colomns. assigns values
+              {'1','2','3'},
+              {'4','5','6'},
+              {'7','8','9'},
+              {'*','0','#'}
+            };
+            byte rowPins[ROWS] = {11, 10, 9, 8};                                         //connect to the row pinouts of the keypad
+            byte colPins[COLS] = {7, 6, 5};                                              //connect to the column pinouts of the keypad
+            //
+            //
+
+            String truth = "3171";                                                       //Sets the password needed to "unlock" circuit
+            Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );    //creates keypad objuct using setup from earlier
+            Servo myServo;                                                               //creates servo object
+
+            void setup(){
+              Serial.begin(9600);                                                        //initialize serial communications at 9600 bps:
+              pinMode(green, OUTPUT);                                                    //initialize green LED as output
+              pinMode(red, OUTPUT);                                                      //initialize green LED as output
+              myServo.attach(3);                                                         //attribute servo to pin 3
+            }
+
+            void loop(){
+              myServo.write(90);                                                         //create 90 degree angle with servo motor
+              String password = "";                                                      //create blank string called password
+
+              while(password.length() < 4){                                              //enter loop that runs while "password" is shorter than 4 chars
+                char key = keypad.getKey();                                              //gets information from keypad
+                if (key){                                                                //enters if a key is pressed
+                  password += key;                                                       //appends current key to "password"
+                }
+                Serial.println(password);                                                //prints password to monitor (used for debugging)
+              }
+              Serial.println(password);                                                  //prints password to monitor (used for debugging)
+              delay(500);                                                                //half second delay
+
+              if (password.equals(truth)) {                                              //enters loop if password matches set password "truth"
+                digitalWrite(green, HIGH);                                               //turns on green LED
+                delay(500);                                                              //half second delay
+                digitalWrite(green, LOW);                                                //turns off green LED
+                myServo.write(0);                                                        //create 0 degree angle with servo ("raise flag")
+                delay(2000);                                                             //2 second delay
+              } else {                                                                   //enters loop if passwords don't match
+                digitalWrite(red, HIGH);                                                 //turns on red LED
+                delay(500);                                                              //half second delay
+                digitalWrite(red, LOW);                                                  //turns off red LED
+              }
+            }
+          </pre>
+        </div>
+        <div>
+          <h2>Questions:</h2>
+          <h4>
+            Say you are using a servo motor you attach to pin 9. In your loop() you have the following code:
+            for (int i=0, i < 180, i++){servo.write(i); delay(100);} <br> Draw a graph with the X axis in
+            seconds, for two seconds, and the y-axis the voltage at pin 9 with respect to ground.
+          </h4>
+          <p>
+
+          </p>
+          <h4>
+            Your input device is slightly broken, leading it to give us an erroneous reading 1% of
+             the time. How can we address this? Answer in (pseudo)code.
+          </h4>
+          <p>
+
+          </p>
+          <h4>
+            Your input device is slightly noisy, leading the measurement to randomly deviate from
+            the true measurement up or down by 10%. How can we address this? Answer in (pseudo)code.
+          </h4>
+          <p>
+
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
