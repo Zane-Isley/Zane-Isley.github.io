@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Zane Isley's HCDE 439 Physical Computing Page!</title>
+
+    <link href="style/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Zane Isley's Final Project!</h1>
+    <div class="grid">
+      <div class="assignment">
+        <div>
+          <h2>Project Proposal:</h2>
+          <div class="header">
+            <img src="assets/final-proposal.JPG" id="vgraph"/>
+          </div>
+        </div>
+        <div>
+          <h2>Circuit Schematic:</h2>
+          <div class="header">
+            <img src="assets/final-circuit.JPG" id="vgraph"/>
+          </div>
+          <p>
+            The circuit schematic for my final project was created using "www.circuit-diagram.org."
+            It details all electrical components needed to create my final project, including photorseistor,
+            3 LEDs, resistors for the LEDs, servo motor and ultrasound sensor. 220 Ohm resistors were used
+            for the red and green lights, and a 100 Ohm resistor was used for the white LED. The
+            layout of this schematic isn't representative of the way the parts interface with eachothet
+            in the product, but the ports and connections match the code I've written.
+          </p>
+        </div>
+        <div>
+          <h2>Circuit:</h2>
+          <div class="header">
+            <img src="assets/frontview.jpeg" />
+            <img src="assets/final-wires.jpeg" />
+          </div>
+          <p>
+            Above we find the front view of the O-bin, featuring the front mounted ultrasonic sensor
+            and the pair of indicator lights. The trashcan sits on top of the breadboard, allowing for
+            most of the wires to be hidden on the board underneath or inside of the can. Ideally, all
+            of the wiring would be hid in or around the can, or in an enclosure to the rear. It is left
+            exposed in these photos for grading purposes. The light sensing "expansion" board is featured
+            in the middle of the second photo and will be elaborated on in the technical specifications.
+          </p>
+          <br>
+        </div>
+        <div>
+          <h2>Technical Implementation</h2>
+          <p>
+            The concept for my final project was to convert my desktop wastepaper bin to a bin that
+            opened automatically when trash is lifted up to it. An additional stretch goal was to have
+            a feature that detects when the can is full and doesn't allow the can to open if it is full.
+            This feature caused the most problems during implementation and I will expand on that at the end
+            of this section.
+            <br>
+            For the main can, I used a ultrasonic sensor to sense trash and a servo motor to open the lid.
+            The sensor needs power and ground, connection to an input "trig" pin and an output "echo" pin.
+            The echo pin sends out a signal and the trig pin waits for the signal to "bounce" off of something
+            and return to the module. We then need to do some calculations to determine the distance the
+            nearest object is to the sensor (see code). All we need to do then is write code to the servo
+            motor to open the lid when distance is less than a certain amount. I mounted the servo motor to
+            the inside of the can using a command strip to improve the form factor of my design. Unfortunately,
+            the servo arm was not able to open the lid in this format. I solved this problem by attatching a nail
+            to the motor to extend the opening arm.
+            <br>
+            The other aspect of this project caused me a lot more trouble. I wanted to create an IR breakbeam
+            sensor to detect when the can is full. The idea was that an IR LED would transmit IR light to a
+            reciever, and when the reciever was getting no data, the can would enter its "full" state.
+            Unfortunately, the IR reciever didn't function the way I thought it would, and I couldn't figure out
+            a way to fix it. I pivotted to a less robust solution of using a white LED and a photoresistor
+            (creating the expansion module I mentioned earlier). The idea was that the LED would create a
+            lot of light in the can that the photoresistor could see. When the can had enough trash in it, the
+            amount of light reaching the photoresistor should go down, emulating the aforementioned "full"
+            condition.
+            <br>
+            When the can is empty, the ultrasonic sensor works as intended, sending and receiving signals and
+            allowing the lid to open when neccessary. There is also a green LED indicator that is lit during
+            this case. When the photoresistor isn't receiving enough light, the red LED indicator is lit. During
+            this time, if trash is held up to the ultrasonic sensor, the lid will not open. Instead, the red
+            light will flash a few times to inform the user the can is full.
+            <br>
+            The photoresistor module assembly can be seen below:
+          </p>
+          <div class="header">
+            <img src="assets/expansion.jpeg" />
+          </div>
+        </div>
+        <div class="header">
+          <h2>Code Snippet:</h2>
+          <pre>
+            #include <Servo.h>                        //retrieves servo library
+
+            Servo myservo;                            //initializes servo as "myservo"
+
+            const int trigPin = 11;                   //assigns ultrasonic trig pin to pin 11
+            const int echoPin = 10;                   //assigns ultrasonic echo pin to pin 12
+            const int red = 3;                        //assigns red LED to pin 3
+            const int green = 2;                      //assigns green LED to pin 3
+            const int emitter = 1;                    //assigns white "emitter" LED to pin 1
+
+            const int photocell = A1;                 //assigns photoresistor to analog pin 1
+
+            float duration, distance;                 //creates float variable used to read ultrasonic sensor
+            int value;                                //creates int value written to by photoresistor
+
+            void setup() {
+              myservo.attach(9);                      //assigns "myservo" to pin 9
+              pinMode(trigPin, OUTPUT);               //initialize trig pin as output
+              pinMode(green, OUTPUT);                 //initialize green LED as output
+              pinMode(red, OUTPUT);                   //initialize red LED as output
+              pinMode(emitter, OUTPUT);               //initialize white LED as output
+              pinMode(photocell, INPUT)               //initialize photoresistor as input
+              pinMode(echoPin, INPUT);                //initialize echo pin as input
+              Serial.begin(9600);                     //initialize serial communications at 9600 bps:
+              digitalWrite(emitter, HIGH);            //turns white LED on high
+            }
+
+            void loop() {
+
+              myservo.write(0);                       //moves servo motor to 0 degree position
+              value = analogRead(photocell);          //reads the amount of light receieved by photocell and assigns it to "value"
+
+              if (value > 750) {                      //checks if value is larger than 750 (empty state)
+                digitalWrite(green, HIGH);            //turnes on green LED
+                digitalWrite(red, LOW);               //turns off red LED
+
+                //code used to opporate ultrasonic sensor adapted from
+                //https://projecthub.arduino.cc/Isaac100/getting-started-with-the-hc-sr04-ultrasonic-sensor-7cabe1
+                //sends signal ↓↓↓
+                digitalWrite(trigPin, LOW);           //turns trig pin to "low"
+                delayMicroseconds(2);                 //2 microsecond delay
+                digitalWrite(trigPin, HIGH);          //turns trig pin to "high"
+                delayMicroseconds(10);                //10 microsecond delay
+                digitalWrite(trigPin, LOW);           //turns trig pin to "low"
+
+                //measure // calculations ↓↓↓
+                duration = pulseIn(echoPin, HIGH);    //reads signal bounced back to sensor
+                distance = (duration*.0343)/2;        //uses duration data bounced back to calculate distance
+
+                if (distance < 5) {                   //checks if distance is less than 5
+                  digitalWrite(emitter, LOW);         //turns off emitter LED
+                  myservo.write(180);                 //moves servo motor to 180 degree position
+                  delay(2000);                        //2 second delay
+                  myservo.write(0);                   //moves servo motor to 0 degree position
+                  digitalWrite(emitter, HIGH);        //turns on emitter LED
+                }
+              } else {
+                digitalWrite(green, LOW);             //turns off green LED
+                digitalWrite(red, HIGH);              //turns on red LED
+
+                digitalWrite(trigPin, LOW);           //turns trig pin to "low"
+                delayMicroseconds(2);                 //2 microsecond delay
+                digitalWrite(trigPin, HIGH);          //turns trig pin to "high"
+                delayMicroseconds(10);                //10 microsecond delay
+                digitalWrite(trigPin, LOW);           //turns trig pin to "low"
+
+                duration = pulseIn(echoPin, HIGH);    //reads signal bounced back to sensor
+                distance = (duration*.0343)/2;        //uses duration data bounced back to calculate distance
+
+                if (distance < 5) {                   //checks if distance is less than 5
+                  digitalWrite(red, LOW);             //turns off red LED
+                  delay(200);                         //fifth of a second delay
+                  digitalWrite(red, HIGH);            //turns on red LED
+                  delay(200);                         //fifth of a second delay
+                  digitalWrite(red, LOW);             //turns off red LED
+                  delay(200);                         //fifth of a second delay
+                  digitalWrite(red, HIGH);            //turns on red LED
+                  delay(200);                         //fifth of a second delay
+                  digitalWrite(red, LOW);             //turns off red LED
+                  delay(200);                         //fifth of a second delay
+                  digitalWrite(red, HIGH);            //turns on red LED
+                  delay(200);                         //fifth of a second delay
+                  digitalWrite(red, LOW);             //turns off red LED
+                  delay(200);                         //fifth of a second delay
+                  digitalWrite(red, HIGH)             //turns on red LED
+                }
+              }
+            }
+          </pre>
+        </div>
+
+        <div>
+          <h2>Video Demonstration:</h2>
+          <div class="header">
+            <h3>Empty Can</h3>
+            <img src="assets/final-empty.gif" id="vgraph"/>
+          </div>
+          <div class="header">
+            <h3>Full Can</h3> <br>
+            <img src="assets/final-full.gif" id="vgraph"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
